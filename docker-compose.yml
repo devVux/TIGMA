@@ -1,0 +1,32 @@
+services:
+  api:
+    build: ./control-api/
+    volumes:
+      - ./control-api:/app
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      start_period: 10s
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  sensor:
+    build: ./sensors/
+    environment:
+      - MQTT_HOST=?
+      - MQTT_PORT=?
+      - MQTT_USER=?
+      - MQTT_PASS=?
+      - CONTROL_API_URL=http://api:8000
+    volumes:
+      - ./sensors:/app
+    networks:
+      - app-net
+    depends_on:
+      api:
+        condition: service_healthy
+
+networks:
+  app-net:
