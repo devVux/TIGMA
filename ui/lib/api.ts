@@ -1,7 +1,6 @@
 const API_URL = "http://localhost:8000"
 
 export async function listSensors(params?: { location?: string; type?: string }) {
-	console.log(API_URL)
   const q = new URLSearchParams(params as any).toString()
   const res = await fetch(`http://api:8000/sensors/?${q}`, { cache: "no-store" })
   return res.json()
@@ -62,7 +61,6 @@ type SensorStatus = {
   status: "alive" | "dead";
 };
 export async function getStatuses(threshold: number = 30): Promise<SensorStatus[]> {
-	console.log(`${API_URL}/statuses?threshold=${threshold}`)
   const res = await fetch(`${API_URL}/statuses?threshold=${threshold}`)
   if (!res.ok) throw new Error(await res.text())
   return res.json()
