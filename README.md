@@ -6,6 +6,14 @@ A containerized IoT monitoring platform built on the **TIG stack** (Telegraf, In
 
 Sensors are fully simulated in Docker, with support for real LoRaWAN devices via The Things Network (TTN).
 
+Simply run
+```sh
+docker compose up
+```
+to get everything up and running
+
+
+
 <details>
 <summary><strong>Architecture</strong></summary>
 
