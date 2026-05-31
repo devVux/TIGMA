@@ -44,11 +44,11 @@ services:
       api:
         condition: service_healthy
 
-  pressure-sensor:
+  co2-sensor:
     image: vuzz/tigma-sensor
     environment:
-      SENSOR_NAME: pressure-sensor-1
-      SENSOR_TYPE: pressure
+      SENSOR_NAME: co2-sensor-1
+      SENSOR_TYPE: co2
       SENSOR_LOCATION: lab
       CONTROL_API_URL: http://api:8000
       MQTT_DATA_HOST: mqtt
