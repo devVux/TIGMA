@@ -12,36 +12,15 @@ async def get_db():
 async def init_db():
     async with aiosqlite.connect(DB_PATH) as db:
         await db.executescript("""
-            CREATE TABLE IF NOT EXISTS sensor(
-                sensorID INTEGER PRIMARY KEY AUTOINCREMENT,
-                name     TEXT NOT NULL,
+          CREATE TABLE IF NOT EXISTS sensor (
+                name     TEXT PRIMARY KEY,
                 type     TEXT NOT NULL,
-                location TEXT NOT NULL
-            );
-
-            CREATE TABLE IF NOT EXISTS sensorStatus (
-                sensorID INTEGER PRIMARY KEY,
+                location TEXT NOT NULL,
                 lastSeen DATETIME,
-                FOREIGN KEY(sensorID) REFERENCES sensor(sensorID)
-            );
-
-            CREATE TABLE IF NOT EXISTS config(
-                configID INTEGER PRIMARY KEY AUTOINCREMENT,
-                sensorID INTEGER NOT NULL,
                 enabled  BOOLEAN DEFAULT 1,
                 interval INTEGER DEFAULT 1,
                 mean     REAL NOT NULL,
-                std      REAL NOT NULL,
-                unit     TEXT,
-                FOREIGN KEY(sensorID) REFERENCES sensor(sensorID)
-            );
-
-            CREATE TABLE IF NOT EXISTS commandLog (
-                cmdID    INTEGER PRIMARY KEY AUTOINCREMENT,
-                sensorID INTEGER,
-                command  TEXT NOT NULL,
-                sentAt   DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(sensorID) REFERENCES sensor(sensorID)
+                std      REAL NOT NULL
             );
         """)
 

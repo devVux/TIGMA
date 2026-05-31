@@ -1,0 +1,4 @@
+__pycache__/
+control-api/
+registry.db
+control-api/routers/__pycache__/**

@@ -10,4 +10,4 @@ COPY . .
 
 ENV PYTHONUNBUFFERED=1
 
-ENTRYPOINT ["/bin/sh", "-c", "exec python3 main.py --id $(hostname)"]
+CMD ["python3", "main.py"]

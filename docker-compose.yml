@@ -1,32 +1,135 @@
 services:
   api:
-    build: ./control-api/
+    build: ./control-api
     volumes:
       - ./control-api:/app
+    ports:
+      - "8000:8000"
     networks:
       - app-net
+    environment:
+      MQTT_HOST: mqtt
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
       start_period: 10s
       interval: 10s
       timeout: 3s
-      retries: 5
+      retries: 3
 
-  sensor:
-    build: ./sensors/
+  temp-sensor:
+    image: tigma-sensor
     environment:
-      - MQTT_HOST=?
-      - MQTT_PORT=?
-      - MQTT_USER=?
-      - MQTT_PASS=?
-      - CONTROL_API_URL=http://api:8000
-    volumes:
-      - ./sensors:/app
+      SENSOR_NAME: temp-sensor-1
+      SENSOR_TYPE: temperature
+      SENSOR_LOCATION: lab
+      CONTROL_API_URL: http://api:8000
+      MQTT_DATA_HOST: mqtt
     networks:
       - app-net
     depends_on:
       api:
         condition: service_healthy
 
+  humidity-sensor:
+    image: tigma-sensor
+    environment:
+      SENSOR_NAME: humidity-sensor-1
+      SENSOR_TYPE: humidity
+      SENSOR_LOCATION: lab
+      CONTROL_API_URL: http://api:8000
+      MQTT_DATA_HOST: mqtt
+    networks:
+      - app-net
+    depends_on:
+      api:
+        condition: service_healthy
+
+  pressure-sensor:
+    image: tigma-sensor
+    environment:
+      SENSOR_NAME: pressure-sensor-1
+      SENSOR_TYPE: pressure
+      SENSOR_LOCATION: lab
+      CONTROL_API_URL: http://api:8000
+      MQTT_DATA_HOST: mqtt
+    networks:
+      - app-net
+    depends_on:
+      api:
+        condition: service_healthy
+
+  mqtt:
+    image: eclipse-mosquitto
+    ports:
+      - "1883:1883"
+    networks:
+      - app-net
+
+  influxdb:
+    image: influxdb:1.8
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb-data:/var/lib/influxdb
+    environment:
+      INFLUXDB_DB: sensorsdata
+      INFLUXDB_ADMIN_USER: admin
+      INFLUXDB_ADMIN_PASSWORD: admin
+      INFLUXDB_USER: telegraf
+      INFLUXDB_USER_PASSWORD: uforobot
+    networks:
+      - app-net
+
+  telegraf:
+    image: telegraf:latest
+    depends_on:
+      - mqtt
+      - influxdb
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    networks:
+      - app-net
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - influxdb
+    networks:
+      - app-net
+
+#  frontend:
+#    build: ./ui
+#    ports:
+#      - "3000:3000"
+#    networks:
+#      - app-net
+#    depends_on:
+#      api:
+#        condition: service_healthy
+#    environment:
+#      NEXT_PUBLIC_API_URL: http://localhost:8000
+
+  frontend:
+    build: ./ui
+    volumes:
+      - ./ui:/app
+    ports:
+      - "3000:3000"
+    networks:
+      - app-net
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+
 networks:
   app-net:
+
+volumes:
+  influxdb-data:
+  grafana-data:

@@ -1,26 +1,21 @@
 from pydantic import BaseModel
-from typing import Optional, Literal
+from typing import Optional
 
 
-class SensorCreate(BaseModel):
+class Sensor(BaseModel):
     name: str
     type: str
     location: str
+    enabled: bool
+    interval: Optional[int] = None
+    mean: float
+    std: float
 
 
 class SensorUpdate(BaseModel):
-    name: Optional[str] = None
     type: Optional[str] = None
     location: Optional[str] = None
-
-
-class SensorConfig(BaseModel):
-    enabled: Optional[bool] = True
-    interval: int
-    mean: float
-    std: float
-    unit: Optional[Literal["C", "F"]] = None
-
-
-class CommandCreate(BaseModel):
-    command: str  # JSON string or dict serialized by caller
+    enabled: Optional[bool] = None
+    interval: Optional[int] = None
+    mean: Optional[float] = None
+    std: Optional[float] = None
