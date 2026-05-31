@@ -1,8 +1,6 @@
 services:
   api:
     build: ./control-api
-    volumes:
-      - ./control-api:/app
     networks:
       - app-net
     ports:
