@@ -3,10 +3,10 @@ services:
     build: ./control-api
     volumes:
       - ./control-api:/app
-    ports:
-      - "8000:8000"
     networks:
       - app-net
+    ports:
+      - "8000:8000"
     environment:
       MQTT_HOST: mqtt
     healthcheck:
@@ -17,7 +17,7 @@ services:
       retries: 3
 
   temp-sensor:
-    image: tigma-sensor
+    image: vuzz/tigma-sensor
     environment:
       SENSOR_NAME: temp-sensor-1
       SENSOR_TYPE: temperature
@@ -31,7 +31,7 @@ services:
         condition: service_healthy
 
   humidity-sensor:
-    image: tigma-sensor
+    image: vuzz/tigma-sensor
     environment:
       SENSOR_NAME: humidity-sensor-1
       SENSOR_TYPE: humidity
@@ -45,7 +45,7 @@ services:
         condition: service_healthy
 
   pressure-sensor:
-    image: tigma-sensor
+    image: vuzz/tigma-sensor
     environment:
       SENSOR_NAME: pressure-sensor-1
       SENSOR_TYPE: pressure
@@ -101,22 +101,8 @@ services:
     networks:
       - app-net
 
-#  frontend:
-#    build: ./ui
-#    ports:
-#      - "3000:3000"
-#    networks:
-#      - app-net
-#    depends_on:
-#      api:
-#        condition: service_healthy
-#    environment:
-#      NEXT_PUBLIC_API_URL: http://localhost:8000
-
   frontend:
     build: ./ui
-    volumes:
-      - ./ui:/app
     ports:
       - "3000:3000"
     networks:
@@ -125,7 +111,7 @@ services:
       api:
         condition: service_healthy
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
+      HOSTNAME: "0.0.0.0"
 
 networks:
   app-net:
